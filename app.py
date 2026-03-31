@@ -11,7 +11,7 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
 # 🔑 API KEY
-client = genai.Client(api_key="AIzaSyCbr7PSOn7gy6jK0n7SQy6b7Bj29xzWLFs")
+client = genai.Client(api_key="")
 
 
 # ------------------ GEMINI OCR ------------------
