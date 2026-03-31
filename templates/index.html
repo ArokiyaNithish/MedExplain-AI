@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MedExplain AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-br from-blue-100 to-purple-100 min-h-screen p-6">
+
+<!-- HEADER -->
+<div class="text-center mb-8">
+    <h1 class="text-4xl font-bold text-gray-800">🧠 MedExplain AI</h1>
+    <p class="text-gray-600 mt-2">Smart Medical Report Analyzer</p>
+</div>
+
+<!-- MAIN CARD -->
+<div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6">
+
+    <!-- UPLOAD SECTION -->
+    <div class="border-2 border-dashed border-gray-300 p-6 rounded-lg text-center hover:border-blue-400 transition">
+        <input type="file" id="fileInput" class="hidden">
+        <button onclick="document.getElementById('fileInput').click()"
+            class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg shadow">
+            📄 Upload Medical Report
+        </button>
+
+        <p class="text-gray-500 mt-2 text-sm">PDF / Image supported</p>
+
+        <button onclick="uploadFile()"
+            class="mt-4 bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg shadow">
+            🚀 Analyze
+        </button>
+    </div>
+
+    <!-- LOADING -->
+    <div id="loading" class="text-center mt-6 hidden">
+        <p class="text-blue-500 font-semibold animate-pulse">Analyzing Report...</p>
+    </div>
+
+    <!-- RESULT SECTION -->
+    <div id="result" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+    <!-- EXPLANATION -->
+    <div id="explanationBox" class="mt-6 hidden bg-blue-50 p-4 rounded-lg shadow">
+        <h3 class="font-bold text-blue-700 mb-2">🧾 AI Explanation</h3>
+        <p id="explanationText" class="text-gray-700"></p>
+    </div>
+
+    <!-- CHAT SECTION -->
+    <div class="mt-8">
+        <h3 class="text-lg font-bold mb-2">💬 Ask AI</h3>
+
+        <div id="chatBox"
+            class="h-64 overflow-y-auto border p-3 rounded-lg bg-gray-50 mb-3 space-y-2">
+        </div>
+
+        <div class="flex gap-2">
+            <input type="text" id="chatInput"
+                class="flex-1 border p-2 rounded-lg"
+                placeholder="Ask about your report...">
+
+            <button onclick="sendChat()"
+                class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg">
+                Send
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+let reportData = {};
+
+function uploadFile() {
+    let file = document.getElementById("fileInput").files[0];
+    if (!file) {
+        alert("Please select a file");
+        return;
+    }
+
+    document.getElementById("loading").classList.remove("hidden");
+
+    let formData = new FormData();
+    formData.append("file", file);
+
+    fetch('/analyze', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("loading").classList.add("hidden");
+
+        reportData = data.data;
+        let resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = "";
+
+        for (let key in data.data) {
+            let value = data.data[key];
+
+            let color = "bg-green-100 text-green-700";
+            if (value === "Low" || value === "High") {
+                color = "bg-red-100 text-red-700";
+            }
+
+            resultDiv.innerHTML += `
+                <div class="p-4 rounded-lg shadow ${color}">
+                    <p class="font-semibold">${key}</p>
+                    <p class="text-xl">${value}</p>
+                </div>
+            `;
+        }
+
+        // Explanation
+        document.getElementById("explanationBox").classList.remove("hidden");
+        document.getElementById("explanationText").innerText = data.explanation;
+    });
+}
+
+function sendChat() {
+    let msg = document.getElementById("chatInput").value;
+    if (!msg) return;
+
+    let chatBox = document.getElementById("chatBox");
+
+    chatBox.innerHTML += `
+        <div class="text-right">
+            <p class="inline-block bg-blue-500 text-white px-3 py-2 rounded-lg">${msg}</p>
+        </div>
+    `;
+
+    document.getElementById("chatInput").value = "";
+
+    fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg, data: reportData })
+    })
+    .then(res => res.json())
+    .then(data => {
+        chatBox.innerHTML += `
+            <div class="text-left">
+                <p class="inline-block bg-gray-300 px-3 py-2 rounded-lg">${data.reply}</p>
+            </div>
+        `;
+
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+}
+</script>
+
+</body>
+</html>
