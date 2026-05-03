@@ -1,477 +1,492 @@
-# 🏥 MedExplain AI — Smart Medical Report Analyzer
+<div align="center">
 
-> Upload a medical report (PDF or image) → OCR extracts values → AI analyzes risks → Chat about your results.
+# 🩺 MedExplain
+
+### *AI-Powered Medical Report Analysis & Patient Assistance System*
+
+[![Python](https://img.shields.io/badge/Python-3.8+-blue?style=for-the-badge&logo=python)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-Web%20Framework-black?style=for-the-badge&logo=flask)](https://flask.palletsprojects.com/)
+[![Gemini API](https://img.shields.io/badge/Google%20Gemini-AI%20Integration-orange?style=for-the-badge&logo=google)](https://aistudio.google.com/)
+[![Hackathon](https://img.shields.io/badge/HackHustle%202.0-Saveetha%20Engineering%20College-purple?style=for-the-badge)](#)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue?logo=apache&style=for-the-badge)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen?style=for-the-badge)](CONTRIBUTING.md)
+
+> 🚀 **An intelligent, real-world medical tech solution** designed to demystify complex medical reports. By leveraging advanced Google Gemini AI models, MedExplain bridges the gap between complicated clinical data and everyday patient understanding, acting as a virtual medical assistant that extracts, analyzes, and explains medical test results in simple language.
+
+</div>
 
 ---
 
 ## 📋 Table of Contents
 
-- [Features](#-features)
-- [Architecture](#-architecture)
-- [Flowchart](#-flowchart)
-- [Project Structure](#-project-structure)
-- [Quick Start](#-quick-start)
-- [API Reference](#-api-reference)
-- [AI Risk Logic](#-ai-risk-logic)
-- [Tech Stack](#-tech-stack)
-- [Troubleshooting](#-troubleshooting)
+- [📌 Problem Statement](#-problem-statement)
+- [💡 Solution & Approach](#-solution--approach)
+- [🎯 Objectives](#-objectives)
+- [🛠️ Technology Stack](#️-technology-stack)
+- [📁 Project Structure](#-project-structure)
+- [🔬 How It Works — System Flowchart](#-how-it-works--system-flowchart)
+- [💻 Code Analysis](#-code-analysis)
+- [📦 Dependencies](#-dependencies)
+- [🚀 Installation & Setup](#-installation--setup)
+- [🎬 System Demo](#-system-demo)
+- [🌍 Impact & Real-World Significance](#-impact--real-world-significance)
+- [🔮 Future Enhancements](#-future-enhancements)
+- [🤝 Open Source Contribution](#-open-source-contribution)
+- [📄 License](#-license)
+- [👨‍💻 Author & Acknowledgments](#-author--acknowledgments)
 
 ---
 
-## ✨ Features
+## 📌 Problem Statement
 
-| Feature | Description |
-|---|---|
-| 📄 **File Upload** | Drag-and-drop or click to upload PDF / JPG / PNG |
-| 🔍 **OCR Extraction** | pytesseract extracts text from images; PyMuPDF reads PDFs |
-| 📊 **Value Parsing** | Regex detects Hemoglobin, Glucose, WBC, RBC, Cholesterol, etc. |
-| 🚦 **Risk Prediction** | Rule-based + OpenAI flags Anemia, Diabetes, CV risk |
-| 🤖 **AI Chat** | GPT-3.5 chatbot answers questions about your specific report |
-| 🎨 **Color-coded UI** | Green = normal, Orange = low, Red = high |
+> **"Patients often receive medical lab reports filled with complex terminology, leading to confusion, anxiety, and a heavy reliance on doctors for basic interpretation."**
 
----
+### Background
 
-## 🏗 Architecture
+**HackHustle 2.0 (Saveetha Engineering College)** Problem Statement: *Medical related advanced project using AI.*
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         USER BROWSER                            │
-│                                                                 │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────────┐  │
-│  │  Upload Page │    │ Results Page │    │   AI Chat UI     │  │
-│  │  (Drag&Drop) │───▶│ (Lab Values) │◀──▶│  (ChatGPT-like)  │  │
-│  └──────────────┘    └──────────────┘    └──────────────────┘  │
-│         │  React + Tailwind CSS (Vanilla HTML or Vite)          │
-└─────────┼───────────────────────────────────────────────────────┘
-          │  HTTP (multipart/form-data or JSON)
-          ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    FASTAPI BACKEND (port 8000)                  │
-│                                                                 │
-│  POST /analyze                    POST /chat                    │
-│  ┌──────────────────────────┐    ┌──────────────────────────┐  │
-│  │ 1. Receive file upload   │    │ 1. Receive question +    │  │
-│  │ 2. Detect PDF or image   │    │    report_data context   │  │
-│  │ 3. OCR extraction        │    │ 2. Build GPT prompt      │  │
-│  │ 4. Regex value parsing   │    │ 3. Call OpenAI API       │  │
-│  │ 5. Risk rule engine      │    │ 4. Return AI answer      │  │
-│  │ 6. OpenAI explanation    │    └──────────────────────────┘  │
-│  │ 7. Return JSON response  │                                   │
-│  └──────────────────────────┘                                   │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-          ┌──────────────┼──────────────┐
-          ▼              ▼              ▼
-    ┌──────────┐  ┌──────────┐  ┌──────────────┐
-    │pytesseract│  │ PyMuPDF  │  │  OpenAI API  │
-    │  (OCR)   │  │  (PDF)   │  │  (GPT-3.5)   │
-    └──────────┘  └──────────┘  └──────────────┘
-```
+Medical reports traditionally come with raw data, numerical values, and clinical jargon. This approach leads to:
+- Patient anxiety due to misinterpretation of data.
+- Unnecessary clinical visits for basic report clarifications.
+- Inability of patients to quickly assess their immediate health risks (like abnormal Glucose or Hemoglobin).
+
+### The Core Problem
+
+| Challenge | Description |
+|-----------|-------------|
+| 🔴 **Complex Terminology** | Medical jargon is unreadable for the average person. |
+| 🔴 **Delayed Understanding** | Patients wait hours or days for a doctor to explain basic results. |
+| 🔴 **Risk Ignorance** | Critical high/low values often go unnoticed by the patient until consultation. |
+| 🔴 **Lack of Follow-up Support** | Patients leave the clinic with questions but no immediate way to ask them. |
 
 ---
 
-## 🔄 Flowchart
+## 💡 Solution & Approach
 
+### Our Strategy
+
+We engineered a streamlined, AI-driven web application to instantly process medical documents and provide conversational support:
+
+1. **Intelligent OCR Extraction** — Extracts critical medical values (like Hemoglobin and Glucose) accurately from image-based reports using the Gemini 2.5 Flash vision model.
+2. **Automated Risk Analysis** — Rule-based backend logic determines if extracted values fall under "Normal", "High", or "Low" thresholds, assigning an overall health risk level.
+3. **AI-Powered Simplification** — Transforms the clinical data into a "Simple English" explanation using Gemini 1.5 Flash, along with actionable precaution suggestions.
+4. **Interactive Medical Chatbot** — An integrated conversational AI contextually aware of the patient's specific report, ready to answer follow-up questions seamlessly.
+
+### Architecture Overview
+
+```text
+[Patient (User)]
+        ↓  Uploads Medical Report (Image/PDF)
+[Frontend Interface (HTML/JS/CSS)]
+        ↓  HTTP POST Request /analyze
+[Flask Backend API]
+        ├── OCR Module (Gemini 2.5 Flash Vision)
+        ├── Rule-based Analysis Engine (Regex & Logic)
+        └── Explanation Generator (Gemini 1.5 Flash)
+        ↓  JSON Response
+[Frontend Interface (Displays Data & Explanation)]
+        ↓  Follow-up Questions
+[Interactive Chatbot Module (/chat)]
 ```
-        ┌─────────────┐
-        │    START    │
-        └──────┬──────┘
-               │
-               ▼
-   ┌─────────────────────┐
-   │   User Visits App   │
-   └──────────┬──────────┘
-              │
-              ▼
-   ┌─────────────────────┐
-   │  Upload PDF/Image   │
-   └──────────┬──────────┘
-              │
-              ▼
-   ┌─────────────────────┐      ┌────────────────┐
-   │  Detect File Type   │─────▶│ PDF? → PyMuPDF │
-   └─────────────────────┘      │ IMG? → Pillow  │
-                                └────────┬───────┘
-                                         │
-                                         ▼
-                              ┌──────────────────────┐
-                              │  OCR Text Extraction │
-                              │    (pytesseract)     │
-                              └──────────┬───────────┘
-                                         │
-                                         ▼
-                              ┌──────────────────────┐
-                              │  Regex Value Parsing │
-                              │  Hemoglobin, Glucose,│
-                              │  WBC, RBC, Chol...   │
-                              └──────────┬───────────┘
-                                         │
-                                         ▼
-                              ┌──────────────────────┐
-                              │   Risk Calculation   │
-                              │  Rule Engine + GPT   │
-                              └──────────┬───────────┘
-                                         │
-                          ┌──────────────┼──────────────┐
-                          ▼              ▼              ▼
-                     ┌─────────┐  ┌──────────┐  ┌──────────┐
-                     │LOW RISK │  │MED RISK  │  │HIGH RISK │
-                     │(green)  │  │(orange)  │  │(red)     │
-                     └────┬────┘  └────┬─────┘  └────┬─────┘
-                          └────────────┼──────────────┘
-                                       │
-                                       ▼
-                              ┌──────────────────────┐
-                              │  Display Results UI  │
-                              │  + AI Explanation    │
-                              └──────────┬───────────┘
-                                         │
-                                         ▼
-                              ┌──────────────────────┐
-                              │   AI Chat Session    │◀─── User Questions
-                              │  (GPT-3.5 context)   │
-                              └──────────┬───────────┘
-                                         │
-                                         ▼
-                                    ┌─────────┐
-                                    │   END   │
-                                    └─────────┘
+
+---
+
+## 🎯 Objectives
+
+- ✅ **Instant Text Extraction** using cutting-edge multimodal AI models.
+- ✅ **Automated Value Parsing** for critical health indicators like Glucose and Hemoglobin.
+- ✅ **Democratize Health Data** by translating medical jargon into simple, actionable language.
+- ✅ **Provide Real-time Q&A** via an intelligent conversational assistant contextually bound to the user's report.
+- ✅ **Build an Open-Source Foundation** for further medical AI integration by the developer community.
+
+---
+
+## 🛠️ Technology Stack
+
+### Backend & AI
+
+| Component | Specification | Role |
+|-----------|--------------|------|
+| **Framework** | Flask | Lightweight Python web framework |
+| **Language** | Python 3 | Primary programming language |
+| **Vision AI** | Gemini 2.5 Flash | OCR and multimodal image extraction |
+| **LLM AI** | Gemini 1.5 Flash | Natural language explanations and chatbot logic |
+| **File Handling** | OS / Werkzeug | Secure local file uploads and management |
+
+### Frontend
+
+| Technology | Role |
+|--------------------|---------|
+| **HTML5/CSS3** | Structure and responsive styling |
+| **JavaScript/ES6** | Asynchronous API calls and dynamic UI updates |
+| **Jinja2 (Templates)**| Server-side rendering with Flask |
+
+---
+
+## 📦 Dependencies
+
+### Core Python Packages
+
+Defined in `requirements.txt`:
+
+```text
+flask                 # Core web framework
+pytesseract           # Optical Character Recognition (Legacy support/Alternative)
+pillow                # Image processing library
+google-generativeai   # Google Gemini API integration
 ```
 
 ---
 
 ## 📁 Project Structure
 
-```
-medexplain/
+```text
+MedExplain/
 │
-├── frontend/
-│   └── index.html              ← Complete single-file frontend (React + Tailwind)
-│                                  Open directly in browser, no build step needed!
+├── 📁 templates/                 # Frontend HTML Views
+│   └── 📄 index.html             # Main Dashboard & Chat Interface
 │
-├── backend/
-│   ├── main.py                 ← FastAPI application (all routes + logic)
-│   ├── requirements.txt        ← Python dependencies
-│   └── .env.example            ← Copy to .env and add your OpenAI key
+├── 📁 uploads/                   # Temporary directory for uploaded reports
 │
-└── README.md                   ← This file
-```
-
-### Optional Vite/React project structure (for production):
-
-```
-frontend/
-├── src/
-│   ├── components/
-│   │   ├── ValueRow.jsx        ← Lab value display with bar chart
-│   │   ├── Chat.jsx            ← AI chat interface
-│   │   └── RiskBadge.jsx       ← Color-coded risk indicator
-│   ├── pages/
-│   │   ├── Upload.jsx          ← Home / upload page
-│   │   └── Results.jsx         ← Analysis results page
-│   ├── App.jsx                 ← Router + state management
-│   └── main.jsx                ← Vite entry point
-├── index.html
-├── tailwind.config.js
-└── package.json
+├── 📄 app.py                     # ⭐ Flask App & Core Business Logic
+├── 📄 requirements.txt           # Python dependencies
+└── 📄 README.md                  # Documentation
 ```
 
 ---
 
-## 🚀 Quick Start
+## 🔬 How It Works — System Flowchart
+
+```mermaid
+flowchart TD
+    A([🌐 User Uploads Medical Report]) --> B[Save File to /uploads]
+    B --> C{Gemini 2.5 Flash Vision}
+    C -- Extract Text --> D[Raw Report Text]
+    
+    D --> E[Regex Analysis Engine]
+    E -- Parse Hemoglobin & Glucose --> F[Risk Assessment Logic]
+    
+    D --> G{Gemini 1.5 Flash LLM}
+    G -- Simplify & Add Precautions --> H[Simple English Explanation]
+    
+    F --> I[Combine Data JSON]
+    H --> I
+    
+    I --> J[Display to User]
+    
+    J --> K{User has questions?}
+    K -- Yes --> L[Send query + Report Data to /chat]
+    L --> M{Gemini 1.5 Flash Chatbot}
+    M --> N[Display AI Answer]
+    
+    style A fill:#2e7d32,color:#fff
+    style C fill:#1565c0,color:#fff
+    style G fill:#1565c0,color:#fff
+    style M fill:#f57f17,color:#fff
+```
+
+### Step-by-Step Operation
+
+| Step | Action | Description |
+|------|--------|-------------|
+| 1 | **Upload** | User uploads a photo or document of their blood test or lab report. |
+| 2 | **Extraction** | System securely passes the image to Gemini Vision API to extract numerical values. |
+| 3 | **Analysis** | Regex captures explicit values. If Glucose > 140, it flags "High Risk". |
+| 4 | **Explanation** | The AI writes a friendly, jargon-free summary and suggests precautions. |
+| 5 | **Interaction** | User chats with the bot: "What foods should I avoid with high glucose?" |
+
+---
+
+## 💻 Code Analysis
+
+### Main Architecture Decisions
+
+#### AI Integration (`app.py`)
+
+```python
+# Utilizing cutting-edge Gemini Vision for Medical OCR
+response = client.models.generate_content(
+    model="gemini-2.5-flash",
+    contents=[
+        {
+            "role": "user",
+            "parts": [
+                {"text": "Extract all medical values like Hemoglobin, Glucose clearly from this report"},
+                {"inline_data": {"mime_type": "image/jpeg", "data": image_bytes}}
+            ]
+        }
+    ]
+)
+```
+
+#### Rule-Based Risk Assessment (`app.py`)
+
+```python
+# Regex parsing ensures precision alongside LLM capabilities
+glucose = re.search(r'Glucose[:\s]*([\d.]+)', text, re.IGNORECASE)
+if glucose:
+    value = float(glucose.group(1))
+    data['Glucose'] = value
+    data['Glucose_status'] = "High" if value > 140 else "Normal"
+```
+
+### Design Decisions
+
+| Decision | Rationale |
+|----------|-----------|
+| **Flask over Django** | Lightweight, rapid prototyping required for a Hackathon environment. |
+| **Gemini Multi-model** | 2.5 Flash for rapid vision/OCR tasks; 1.5 Flash for nuanced text generation. |
+| **Hybrid Analysis** | Using both LLM text generation and hardcoded Regex ensures accurate numeric risk flags without hallucination. |
+
+---
+
+## 🚀 Installation & Setup
 
 ### Prerequisites
 
-- Python 3.9+
-- Node.js 18+ (optional — only needed for Vite build)
-- Tesseract OCR installed on your system
-- An OpenAI API key
+- [Python 3.8+](https://www.python.org/downloads/)
+- A Google Gemini API Key (Get one at [Google AI Studio](https://aistudio.google.com/))
 
-### Step 1 — Install Tesseract OCR
+### 1. Clone the Repository
 
-**macOS:**
 ```bash
-brew install tesseract
+git clone https://github.com/your-username/medexplain.git
+cd medexplain
 ```
 
-**Ubuntu / Debian:**
-```bash
-sudo apt-get install tesseract-ocr
-```
-
-**Windows:**
-Download and install from:
-https://github.com/UB-Mannheim/tesseract/wiki
-
-Then add to PATH: `C:\Program Files\Tesseract-OCR`
-
-### Step 2 — Backend Setup
+### 2. Create a Virtual Environment (Optional but Recommended)
 
 ```bash
-# 1. Navigate to backend folder
-cd medexplain/backend
-
-# 2. Create virtual environment
 python -m venv venv
-
-# 3. Activate it
-# On macOS/Linux:
-source venv/bin/activate
-# On Windows:
+# On Windows
 venv\Scripts\activate
-
-# 4. Install dependencies
-pip install -r requirements.txt
-
-# 5. Set your OpenAI API key
-cp .env.example .env
-# Edit .env and paste your key:
-# OPENAI_API_KEY=sk-your-actual-key-here
-
-# 6. Run the server
-uvicorn main:app --reload --port 8000
+# On Mac/Linux
+source venv/bin/activate
 ```
 
-You should see:
-```
-INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-INFO:     Application startup complete.
-```
-
-Visit http://localhost:8000 to verify the API is running.
-
-### Step 3 — Frontend Setup
-
-**Option A — Zero build (recommended for beginners):**
-
-Simply open `frontend/index.html` in your browser. It uses React via CDN.
-
-> ⚠️ Some browsers block local CORS requests. If you see errors, serve it:
-> ```bash
-> cd medexplain/frontend
-> python -m http.server 3000
-> ```
-> Then open: http://localhost:3000
-
-**Option B — Vite (for development with hot-reload):**
+### 3. Install Dependencies
 
 ```bash
-cd medexplain/frontend
-npm create vite@latest . -- --template react
-npm install -D tailwindcss postcss autoprefixer
-npx tailwindcss init -p
-npm install
-npm run dev
+pip install -r requirements.txt
 ```
 
-Then replace `src/App.jsx` with the component logic from `index.html`.
+### 4. Configure API Key
+
+Open `app.py` and replace the placeholder API key with your actual Google Gemini API Key:
+```python
+client = genai.Client(api_key="YOUR_GOOGLE_GEMINI_API_KEY")
+```
+*(Note: In production, use `.env` files to store secrets!)*
+
+### 5. Run the Application
+
+```bash
+python app.py
+```
+
+### 6. Access the Portal
+
+Open your browser and navigate to: `http://localhost:50003`
 
 ---
 
-## 📡 API Reference
+## 🌍 Impact & Real-World Significance
 
-### `POST /analyze`
+### Who Benefits
 
-Analyzes an uploaded medical report file.
+| Stakeholder | Benefit |
+|-------------|---------|
+| 🧑‍⚕️ **Patients** | Instant peace of mind, improved health literacy, and immediate basic precautions. |
+| 🏥 **Hospitals/Clinics** | Reduced volume of non-critical calls asking for basic report clarifications. |
+| 👨‍🦳 **Elderly Care** | Simple interfaces to help the elderly understand complex health documents. |
 
-**Request:** `multipart/form-data`
-- `file`: PDF, JPG, or PNG file
+### System vs. Traditional Approach
 
-**Response:**
-```json
-{
-  "raw_text": "LABORATORY REPORT...",
-  "values": {
-    "hemoglobin": {
-      "value": 10.5,
-      "unit": "g/dL",
-      "status": "low",
-      "normal_range": "12.0 – 17.5"
-    },
-    "glucose": {
-      "value": 156.0,
-      "unit": "mg/dL",
-      "status": "high",
-      "normal_range": "70.0 – 100.0"
-    }
-  },
-  "risk": {
-    "level": "High",
-    "risks": [
-      {
-        "condition": "Anemia",
-        "severity": "medium",
-        "reason": "Hemoglobin 10.5 g/dL is below normal range"
-      },
-      {
-        "condition": "Diabetes Risk",
-        "severity": "high",
-        "reason": "Glucose 156.0 mg/dL is significantly elevated"
-      }
-    ]
-  },
-  "explanation": "Your hemoglobin is slightly low, which may indicate anemia..."
-}
-```
+| Traditional Process | MedExplain AI System |
+|---------------------|---------------------|
+| Wait days for consultation | **Instant 10-second Analysis** |
+| Confusing Medical Jargon | **Simple English Breakdown** |
+| Google searching random symptoms | **Context-Aware Report Chatbot** |
 
 ---
 
-### `POST /chat`
+## 🔮 Future Enhancements
 
-Chat with AI about your report.
-
-**Request:** `application/json`
-```json
-{
-  "question": "Should I be worried about my glucose level?",
-  "report_data": {
-    "values": { ... },
-    "risk": { ... },
-    "explanation": "..."
-  }
-}
-```
-
-**Response:**
-```json
-{
-  "answer": "Your glucose of 156 mg/dL is above the normal fasting range of 70–100 mg/dL. This may indicate pre-diabetes or diabetes. I strongly recommend scheduling an appointment with your doctor for an HbA1c test. In the meantime, reducing sugary foods and increasing physical activity can help. Always consult your doctor for a proper diagnosis."
-}
-```
+- [ ] **Multi-language Support** — Translate medical explanations into regional languages automatically.
+- [ ] **PDF Parsing** — Add native support for multi-page PDF medical reports using PyMuPDF.
+- [ ] **Doctor Dashboard** — A portal for doctors to review the AI's preliminary assessments before approving them for the patient.
+- [ ] **Historical Tracking** — Allow users to create accounts and track their Glucose/Hemoglobin trends over months with interactive charts.
+- [ ] **HIPAA Compliance** — Implement strong encryption and zero-retention policies for uploaded medical images.
 
 ---
 
-## 🤖 AI Risk Logic
+## 🤝 Open Source Contribution
 
-### Detected Biomarkers
+We warmly welcome contributions from the community! MedExplain is designed to be the foundational step in democratizing medical AI. 
 
-| Biomarker | Normal Range | Low Risk Condition | High Risk Condition |
-|---|---|---|---|
-| Hemoglobin | 12.0–17.5 g/dL | Anemia (below 12) | — |
-| Glucose | 70–100 mg/dL | Pre-Diabetes (100–140) | Diabetes Risk (>140) |
-| WBC | 4.5–11.0 K/μL | Immune Concern | Infection/Inflammation |
-| RBC | 4.2–5.9 M/μL | Low RBC count | — |
-| Platelets | 150–400 K/μL | Thrombocytopenia | Thrombocytosis |
-| Cholesterol | 0–200 mg/dL | — | Cardiovascular Risk |
-| Creatinine | 0.6–1.2 mg/dL | — | Kidney Concern |
-| Sodium | 136–145 mEq/L | Hyponatremia | Hypernatremia |
-| Potassium | 3.5–5.0 mEq/L | Hypokalemia | Hyperkalemia |
+Whether it's **adding new medical parameters (Cholesterol, BP)**, **improving the UI**, or **optimizing the prompt engineering** — every contribution matters! 🎉
 
-### Risk Level Calculation
+### How to Be a Great Open-Source Contributor
 
-```
-Any value = HIGH severity  →  Overall Risk = High
-All values = MEDIUM severity  →  Overall Risk = Medium
-No abnormal values  →  Overall Risk = Low
-```
+1. **Understand the Codebase:** Read through `app.py` to see how the Gemini API calls are structured.
+2. **Find an Issue:** Look at the "Future Enhancements" section above for inspiration.
+3. **Communicate:** If you plan a massive overhaul, open a GitHub Issue first to discuss it with the maintainers.
+4. **Test Your Code:** Ensure that image uploads still work perfectly after your changes.
 
-### OCR Regex Patterns
+### Step-by-Step Contribution Guide
 
-The backend uses case-insensitive regex to find values like:
+```bash
+# 1. Fork the repository on GitHub by clicking the "Fork" button.
 
-```
-Hemoglobin: 10.5
-HGB : 10.5
-HB: 10.5
-Glucose: 156 mg/dL
-Blood Sugar: 156
-Fasting Glucose: 156
+# 2. Clone your fork locally
+git clone https://github.com/YOUR_USERNAME/medexplain.git
+
+# 3. Create a feature branch
+git checkout -b feature/add-pdf-support
+
+# 4. Make your changes, write brilliant code, and commit
+git commit -m "feat: added PDF parsing capabilities for medical reports"
+
+# 5. Push to your fork
+git push origin feature/add-pdf-support
+
+# 6. Open a Pull Request on GitHub against the main branch!
 ```
 
----
+### Contribution Areas
 
-## 🛠 Tech Stack
-
-| Layer | Technology | Purpose |
-|---|---|---|
-| Frontend | React 18 | UI components and state |
-| Styling | Tailwind CSS / Custom CSS | Responsive, clean design |
-| Backend | FastAPI (Python) | REST API server |
-| OCR | pytesseract + Pillow | Image → Text |
-| PDF | PyMuPDF (fitz) | PDF → Text |
-| AI (Explain) | OpenAI GPT-3.5 | Natural language explanation |
-| AI (Chat) | OpenAI GPT-3.5 | Context-aware Q&A |
-| Risk Logic | Python rule engine | Biomarker thresholds |
-| Server | Uvicorn (ASGI) | ASGI server for FastAPI |
+| Area | Good First Issue? | Description |
+|------|------------------|-------------|
+| 🎨 **UI Enhancements** | ✅ Yes | Improve the HTML/CSS in `templates/index.html` |
+| 🧪 **Add New Metrics** | ✅ Yes | Update the regex in `analyze_report()` to catch Cholesterol |
+| 🔒 **Security** | ⚡ Medium | Migrate the hardcoded API key to use python-dotenv |
+| 🤖 **Prompt Engineering**| 🔥 Advanced | Optimize the Gemini prompts to reduce token usage and improve accuracy |
 
 ---
 
-## 🔧 Troubleshooting
+## 📄 License
 
-### "CORS error" in browser console
-Make sure the FastAPI server is running on port 8000. CORS is configured to allow `localhost:3000` and `localhost:5173`.
+This project is licensed under the Apache License 2.0 — you are free to use, modify, and distribute this code with proper attribution and compliance with the license terms.
 
-### "TesseractNotFoundError"
-Tesseract is not installed or not in your PATH. See Step 1 above.
+```text
+📄 License
+This project is licensed under the Apache License 2.0 — you are free to use, modify, and distribute this code with proper attribution and compliance with the license terms.
 
-### "openai.AuthenticationError"
-Your OpenAI API key is missing or invalid. Edit `backend/.env` and add your key. The app will still work without a key (falls back to rule-based explanations), but chat responses will be generic.
+Apache License
+Version 2.0, January 2004
+http://www.apache.org/licenses/
 
-### "No values detected"
-The report text may be too faint, rotated, or use non-standard formatting. Try:
-- A higher-resolution scan
-- Straightening the image
-- Using a text-based PDF instead of a scanned image
+Copyright (c) 2026 Arokiya Nithish J
 
-### "Module not found: fitz"
-Run: `pip install PyMuPDF`
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-### Backend returns 422 Unprocessable Entity
-The file type is not supported. Only `image/jpeg`, `image/png`, and `application/pdf` are accepted.
+    http://www.apache.org/licenses/LICENSE-2.0  
 
----
-
-## 🔐 Privacy Note
-
-- Files are processed in-memory and are **not saved to disk or any database**.
-- Raw text is truncated to 500 characters in the API response.
-- If you need persistent storage, add MongoDB with `motor` (async MongoDB driver) and store anonymized reports.
-
----
-
-## 📝 Sample Test Report
-
-To test without a real report, create a text file with this content, print it, and photograph it (or convert to PDF):
-
-```
-LABORATORY REPORT
-Patient Name: John Doe
-Date: 2024-01-15
-
-COMPLETE BLOOD COUNT
-Hemoglobin (HGB): 10.2 g/dL       [Reference: 12.0-17.5]
-WBC: 12.5 K/uL                     [Reference: 4.5-11.0]
-RBC: 3.8 M/uL                      [Reference: 4.2-5.9]
-Platelets: 180 K/uL                 [Reference: 150-400]
-
-METABOLIC PANEL
-Glucose: 162 mg/dL                  [Reference: 70-100]
-Sodium: 140 mEq/L                   [Reference: 136-145]
-Potassium: 4.1 mEq/L               [Reference: 3.5-5.0]
-Creatinine: 0.9 mg/dL              [Reference: 0.6-1.2]
-
-LIPID PANEL
-Total Cholesterol: 225 mg/dL        [Reference: < 200]
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 ```
 
-This will trigger: Anemia (low HGB), Diabetes Risk (high glucose), Cardiovascular Risk (high cholesterol), and WBC elevation — giving a **High** risk result for demonstration.
+See [LICENSE](LICENSE) for full details.
 
 ---
 
-## 🤝 Contributing
+## 👨‍💻 Author & Acknowledgments
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/my-feature`
-3. Commit your changes: `git commit -m 'Add my feature'`
-4. Push to the branch: `git push origin feature/my-feature`
-5. Open a Pull Request
+### Author
+
+**Arokiya Nithish J**
+- Role: Full Stack AI Developer
+- 📅 Year: 2026
+- 🎓 Engineering Student (B.Tech AI&DS)
+- 💼 Domain: Python | AI/ML | Web Development
+
+**Contacts**
+- GitHub: [@ArokiyaNithish](https://github.com/ArokiyaNithish)
+- LinkedIn: [@Arokiya Nithish J](https://www.linkedin.com/in/arokiya-nithishj/)
+- Email: arokiyanithishj@gmail.com
+- Portfolio: [arokiyanithish.github.io/portfolio](https://arokiyanithish.github.io/portfolio/)
+
+### Acknowledgments
+
+- 🏫 **Saveetha Engineering College** — For hosting HackHustle 2.0 and providing this challenging problem statement.
+- 🧠 **Google Gemini Team** — For the powerful multimodal AI APIs making this possible.
+- 🐍 **Flask Community** — For the incredibly simple and effective web framework.
 
 ---
 
-## ⚠️ Disclaimer
+<div align="center">
 
-MedExplain AI is an educational tool only. It is **not** a medical device, does **not** provide medical advice, and is **not** a substitute for professional medical consultation. Always consult a qualified healthcare provider for diagnosis and treatment decisions.
+For support, email arokiyanithishj@gmail.com or open an issue on GitHub.
+
+### 🌟 If this project helped you — please give it a ⭐ Star on GitHub!
+
+**#Python #Flask #GenerativeAI #GoogleGemini #HealthTech #HackHustle**
+
+*Made with ❤️ by Arokiya Nithish*
+
+*© 2026 — Arokiya Nithish J*
+
+</div>
+
+
+```text
+NOTICE
+
+Project Name: MedExplain
+Copyright (c) 2026 Arokiya Nithish J
+
+This product includes software developed by Arokiya Nithish J.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
 ---
 
-*Built with ❤️ using FastAPI, React, pytesseract, and OpenAI*
+Third-Party Attributions
+
+This project may include or depend on third-party libraries.
+Attributions and licenses for those components are listed below:
+
+* Flask — Copyright 2010 Pallets
+  Licensed under BSD 3-Clause License
+  Source: https://github.com/pallets/flask
+
+* Google Generative AI SDK — Copyright Google LLC
+  Licensed under Apache License 2.0
+  Source: https://github.com/google/generative-ai-python
+
+* Pillow — Copyright (c) 1997-2011 by Secret Labs AB, 1995-2011 by Fredrik Lundh
+  Licensed under Historical Permission Notice and Disclaimer (HPND)
+  Source: https://github.com/python-pillow/Pillow
+
+* PyTesseract — Copyright (c) 2014-2026 Samuel Hoffstaetter and others
+  Licensed under Apache License 2.0
+  Source: https://github.com/madmaze/pytesseract
+
+---
+
+Modifications
+
+If you have modified this project, you should add a statement here such as:
+
+"This project has been modified by <Your Name/Organization> on <Date>.
+Changes include: <brief description of changes>"
+
+---
+
+END OF NOTICE
+```
