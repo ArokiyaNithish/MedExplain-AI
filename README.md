@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🩺 MedExplain
+# 🩺AI MedExplain Document Analysis
 
 ### *AI-Powered Medical Report Analysis & Patient Assistance System*
 
