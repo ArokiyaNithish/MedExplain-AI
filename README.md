@@ -400,7 +400,7 @@ See [LICENSE](LICENSE) for full details.
 ### Author
 
 **Arokiya Nithish J**
-- Role: Full Stack AI Developer
+- Role: Full Stack AI Developer and AI engineer
 - 📅 Year: 2026
 - 🎓 Engineering Student (B.Tech AI&DS)
 - 💼 Domain: Python | AI/ML | Web Development
@@ -418,22 +418,6 @@ See [LICENSE](LICENSE) for full details.
 - 🐍 **Flask Community** — For the incredibly simple and effective web framework.
 
 ---
-
-<div align="center">
-
-For support, email arokiyanithishj@gmail.com or open an issue on GitHub.
-
-### 🌟 If this project helped you — please give it a ⭐ Star on GitHub!
-
-**#Python #Flask #GenerativeAI #GoogleGemini #HealthTech #HackHustle**
-
-*Made with ❤️ by Arokiya Nithish*
-
-*© 2026 — Arokiya Nithish J*
-
-</div>
-
-
 ```text
 NOTICE
 
@@ -490,3 +474,20 @@ Changes include: <brief description of changes>"
 
 END OF NOTICE
 ```
+---
+<div align="center">
+
+For support, email arokiyanithishj@gmail.com or open an issue on GitHub.
+
+### 🌟 If this project helped you — please give it a ⭐ Star on GitHub!
+
+**#Python #Flask #GenerativeAI #GoogleGemini #HealthTech #HackHustle**
+
+*Made with ❤️ by Arokiya Nithish*
+
+*© 2026 — Arokiya Nithish J*
+
+</div>
+
+
+
